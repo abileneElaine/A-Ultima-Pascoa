@@ -2,16 +2,20 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public float playerVelocity = 10;
+    public float playerVelocity = 10f;
+    public float jumpForce = 10f;
     public PlayerAnimationController playerAnim;
+    public Rigidbody2D rb;
+
+    private bool isGrounded = true;
 
     private void Update()
     {
         float horizontal = Input.GetAxisRaw("Horizontal");
 
+        // Movimento horizontal
         if (Mathf.Abs(horizontal) > 0)
         {
-            // Movimento
             transform.position += transform.right * horizontal * (Time.deltaTime * playerVelocity);
 
             // Flip
@@ -19,12 +23,29 @@ public class PlayerMovement : MonoBehaviour
             scale.x = Mathf.Sign(horizontal) * Mathf.Abs(scale.x);
             transform.localScale = scale;
 
-            // Ativa animaÁ„o
             playerAnim.SetIsWalking(true);
         }
         else
         {
             playerAnim.SetIsWalking(false);
+        }
+
+        // Pulo
+        if (Input.GetButtonDown("Jump") && isGrounded)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            isGrounded = false;
+            playerAnim.SetIsJumping(true);
+        }
+    }
+
+    // Detecta se est√° no ch√£o usando colis√£o
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.collider.CompareTag("Ground"))
+        {
+            isGrounded = true;
+            playerAnim.SetIsJumping(false);
         }
     }
 }
