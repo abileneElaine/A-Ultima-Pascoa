@@ -13,8 +13,16 @@ public class PlayerMovement : MonoBehaviour
     {
         float horizontal = Input.GetAxisRaw("Horizontal");
 
-        // Movimento horizontal
-        if (Mathf.Abs(horizontal) > 0)
+        // Pulo
+        if (Input.GetButtonDown("Jump") && isGrounded)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            isGrounded = false;
+            playerAnim.SetIsJumping(true);
+        }
+
+        // Só anda se estiver no chão e não pulando
+        if (isGrounded && Mathf.Abs(horizontal) > 0)
         {
             transform.position += transform.right * horizontal * (Time.deltaTime * playerVelocity);
 
@@ -29,15 +37,8 @@ public class PlayerMovement : MonoBehaviour
         {
             playerAnim.SetIsWalking(false);
         }
-
-        // Pulo
-        if (Input.GetButtonDown("Jump") && isGrounded)
-        {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-            isGrounded = false;
-            playerAnim.SetIsJumping(true);
-        }
     }
+
 
     // Detecta se está no chão usando colisão
     private void OnCollisionEnter2D(Collision2D collision)
